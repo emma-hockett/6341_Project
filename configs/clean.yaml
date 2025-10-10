@@ -1,20 +1,3 @@
-features:
-  drop:
-    - purchaser_type
-    - rate_spread
-    - hoepa_status
-    - denial_reason_1
-    - denial_reason_2
-    - denial_reason_3
-    - denial_reason_4
-    - total_loan_costs
-    - total_points_and_fees
-    - origination_charges
-    - discount_points
-    - lender_credits
-    - interest_rate
-    - aus_1
-    - aus_2
-    - aus_3
-    - aus_4
-    - aus_5
+clean:
+  null_like: ["", "na", "n/a", "null", "none", ".", "-", "--"]
+  exempt_tokens_default: ["exempt"]
