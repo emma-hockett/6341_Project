@@ -43,6 +43,7 @@ columns:
     role: feature
     type: string
     dtype: string
+    exempt: true
   census_tract:
     role: feature
     type: string
@@ -187,6 +188,7 @@ columns:
     role: drop
     type: string
     dtype: string
+    exempt: true
   hoepa_status:
     role: drop
     type: string
@@ -223,46 +225,57 @@ columns:
     role: drop
     type: string
     dtype: string
+    exempt: true
   total_points_and_fees:
     role: drop
     type: string
     dtype: string
+    exempt: true
   origination_charges:
     role: drop
     type: string
     dtype: string
+    exempt: true
   discount_points:
     role: drop
     type: string
     dtype: string
+    exempt: true
   lender_credits:
     role: drop
     type: string
     dtype: string
+    exempt: true
   interest_rate:
     role: drop
     type: string
     dtype: string
+    exempt: true
   prepayment_penalty_term:
     role: feature
     type: categorical
     dtype: string
+    exempt: true
   debt_to_income_ratio:
     role: feature
     type: categorical
     dtype: string
+    exempt: true
   combined_loan_to_value_ratio:
     role: feature
     type: categorical
     dtype: string
+    exempt: true
   loan_term:
     role: feature
     type: categorical
     dtype: string
+    exempt: true
   intro_rate_period:
     role: feature
     type: categorical
     dtype: string
+    exempt: true
   balloon_payment:
     role: feature
     type: categorical
@@ -283,6 +296,7 @@ columns:
     role: feature
     type: numeric
     dtype: Float32
+    exempt: true
   manufactured_home_secured_property_type:
     role: feature
     type: categorical
@@ -299,6 +313,7 @@ columns:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   submission_of_application:
     role: feature
     type: categorical
