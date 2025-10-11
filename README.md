@@ -48,7 +48,6 @@ Below is a quick guide to how everything fits together.
 ### /data
 
 This folder is ignored by Git to prevent huge files from being committed.
-Each teammate should create the same subfolder structure locally:
 
 ```text
 data/
@@ -56,6 +55,40 @@ data/
 ├─ interim/     # Cleaned / typed data saved as Parquet/Feather
 └─ processed/   # Final modeling dataset (ready for training)
 ```
+All project data is stored as Parquet files. You don’t need to remember file paths — just use the helper methods in src/utils/file_utils.py.
+
+#### Loading a dataset
+```text
+import src.utils.file_utils as fu
+
+# Example: load the raw HMDA dataset
+df = fu.load_parquet("hmda_raw")
+```
+
+This automatically:
+- Finds the correct path from configs/paths.yaml 
+- Uses the fast PyArrow backend	
+- Returns a ready-to-use Pandas DataFrame
+
+#### Saving a dataset
+
+```text
+import src.utils.file_utils as fu
+
+# Example: save the cleaned/typed 2024 HMDA dataset
+fu.save_parquet(df, "hmda_2024_typed")
+```
+
+This ensures:
+- Files are written to the correct folder (e.g., data/interim/)
+- The same Parquet format and compression are used consistently
+- The output path is printed so you know where the file was saved
+
+#### Tips
+- Valid dataset keys (e.g., hmda_raw, hmda_2024_typed) are defined in configs/paths.yaml
+- Never hardcode paths — always use fu.load_parquet() and fu.save_parquet() for consistency across the team
+
+
 #### Workflow
 
 1.	Download the 2024 HMDA modified LAR CSV and place it in data/raw/.

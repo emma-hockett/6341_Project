@@ -1,0 +1,356 @@
+columns:
+  activity_year:
+    role: feature
+    type: numeric
+    dtype: Int16
+  lei:
+    role: feature
+    type: string
+    dtype: string
+  loan_type:
+    role: feature
+    type: categorical
+    dtype: Int16
+  loan_purpose:
+    role: feature
+    type: categorical
+    dtype: Int16
+  preapproval:
+    role: feature
+    type: categorical
+    dtype: Int16
+  construction_method:
+    role: feature
+    type: categorical
+    dtype: Int16
+  occupancy_type:
+    role: feature
+    type: categorical
+    dtype: Int16
+  loan_amount:
+    role: feature
+    type: numeric
+    dtype: Float32
+  action_taken:
+    role: feature
+    type: categorical
+    dtype: Int16
+  state_code:
+    role: feature
+    type: categorical
+    dtype: string
+  county_code:
+    role: feature
+    type: categorical
+    dtype: string
+    exempt: true
+  census_tract:
+    role: feature
+    type: categorical
+    dtype: string
+  applicant_ethnicity_1:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_ethnicity_2:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_ethnicity_3:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_ethnicity_4:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_ethnicity_5:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_ethnicity_1:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_ethnicity_2:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_ethnicity_3:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_ethnicity_4:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_ethnicity_5:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_ethnicity_observed:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_ethnicity_observed:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_race_1:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_race_2:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_race_3:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_race_4:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_race_5:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_race_1:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_race_2:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_race_3:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_race_4:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_race_5:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_race_observed:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_race_observed:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_sex:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_sex:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_sex_observed:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_sex_observed:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_age:
+    role: feature
+    type: categorical
+    dtype: string
+  applicant_age_above_62:
+    role: feature
+    type: categorical
+    dtype: string
+  co_applicant_age:
+    role: feature
+    type: categorical
+    dtype: string
+  co_applicant_age_above_62:
+    role: feature
+    type: categorical
+    dtype: string
+  income:
+    role: feature
+    type: numeric
+    dtype: Float64
+  purchaser_type:
+    role: drop
+    type: string
+    dtype: string
+  rate_spread:
+    role: drop
+    type: string
+    dtype: string
+    exempt: true
+  hoepa_status:
+    role: drop
+    type: string
+    dtype: string
+  lien_status:
+    role: feature
+    type: categorical
+    dtype: Int16
+  applicant_credit_scoring_model:
+    role: feature
+    type: categorical
+    dtype: Int16
+  co_applicant_credit_scoring_model:
+    role: feature
+    type: categorical
+    dtype: Int16
+  denial_reason_1:
+    role: drop
+    type: string
+    dtype: string
+  denial_reason_2:
+    role: drop
+    type: string
+    dtype: string
+  denial_reason_3:
+    role: drop
+    type: string
+    dtype: string
+  denial_reason_4:
+    role: drop
+    type: string
+    dtype: string
+  total_loan_costs:
+    role: drop
+    type: string
+    dtype: string
+    exempt: true
+  total_points_and_fees:
+    role: drop
+    type: string
+    dtype: string
+    exempt: true
+  origination_charges:
+    role: drop
+    type: string
+    dtype: string
+    exempt: true
+  discount_points:
+    role: drop
+    type: string
+    dtype: string
+    exempt: true
+  lender_credits:
+    role: drop
+    type: string
+    dtype: string
+    exempt: true
+  interest_rate:
+    role: drop
+    type: string
+    dtype: string
+    exempt: true
+  prepayment_penalty_term:
+    role: feature
+    type: categorical
+    dtype: string
+    exempt: true
+  debt_to_income_ratio:
+    role: feature
+    type: categorical
+    dtype: string
+    exempt: true
+  combined_loan_to_value_ratio:
+    role: feature
+    type: categorical
+    dtype: string
+    exempt: true
+  loan_term:
+    role: feature
+    type: categorical
+    dtype: string
+    exempt: true
+  intro_rate_period:
+    role: feature
+    type: categorical
+    dtype: string
+    exempt: true
+  balloon_payment:
+    role: feature
+    type: categorical
+    dtype: Int16
+  interest_only_payment:
+    role: feature
+    type: categorical
+    dtype: Int16
+  negative_amortization:
+    role: feature
+    type: categorical
+    dtype: Int16
+  other_non_amortizing_features:
+    role: feature
+    type: categorical
+    dtype: Int16
+  property_value:
+    role: feature
+    type: numeric
+    dtype: Float32
+    exempt: true
+  manufactured_home_secured_property_type:
+    role: feature
+    type: categorical
+    dtype: Int16
+  manufactured_home_land_property_interest:
+    role: feature
+    type: categorical
+    dtype: Int16
+  total_units:
+    role: feature
+    type: categorical
+    dtype: string
+  multifamily_affordable_units:
+    role: feature
+    type: categorical
+    dtype: Int16
+    exempt: true
+  submission_of_application:
+    role: feature
+    type: categorical
+    dtype: Int16
+  initially_payable_to_institution:
+    role: feature
+    type: categorical
+    dtype: Int16
+  aus_1:
+    role: drop
+    type: string
+    dtype: string
+  aus_2:
+    role: drop
+    type: string
+    dtype: string
+  aus_3:
+    role: drop
+    type: string
+    dtype: string
+  aus_4:
+    role: drop
+    type: string
+    dtype: string
+  aus_5:
+    role: drop
+    type: string
+    dtype: string
+  reverse_mortgage:
+    role: feature
+    type: categorical
+    dtype: Int16
+  open_end_line_of_credit:
+    role: feature
+    type: categorical
+    dtype: Int16
+  business_or_commercial_purpose:
+    role: feature
+    type: categorical
+    dtype: Int16

@@ -1,0 +1,8 @@
+clean:
+  null_like: ["", "na", "n/a", "null", "none", ".", "-", "--"]
+  exempt_tokens_default: ["exempt"]
+
+  action_taken:
+    approved: [1, 2, 8]
+    denied: [3, 7]
+    exclude: [4, 5, 6]
