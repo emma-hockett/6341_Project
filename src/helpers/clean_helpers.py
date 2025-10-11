@@ -103,3 +103,13 @@ def strip_string_columns_inplace(df: pd.DataFrame) -> None:
         s = df[col]
         if is_string_dtype(s.dtype):
             df[col] = s.str.strip()
+
+
+def to_pandas_categoricals(df: pd.DataFrame, cat_cols: list[str]) -> None:
+    """
+    In-place: turn columns into pandas 'category'.
+    """
+    for col in cat_cols:
+        if col not in df.columns:
+            continue
+        df[col] = df[col].astype("category")

@@ -37,16 +37,16 @@ columns:
     dtype: Int16
   state_code:
     role: feature
-    type: string
+    type: categorical
     dtype: string
   county_code:
     role: feature
-    type: string
+    type: categorical
     dtype: string
     exempt: true
   census_tract:
     role: feature
-    type: string
+    type: categorical
     dtype: string
   applicant_ethnicity_1:
     role: feature
