@@ -179,7 +179,7 @@ columns:
   income:
     role: feature
     type: numeric
-    dtype: Int16
+    dtype: Float64
   purchaser_type:
     role: drop
     type: string
