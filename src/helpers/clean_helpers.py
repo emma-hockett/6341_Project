@@ -113,3 +113,24 @@ def to_pandas_categoricals(df: pd.DataFrame, cat_cols: list[str]) -> None:
         if col not in df.columns:
             continue
         df[col] = df[col].astype("category")
+
+
+def apply_action_taken_flag(df: pd.DataFrame, cfg_clean: dict) -> pd.DataFrame:
+    """
+    Create binary target variable 'approved_flag' from action_taken codes.
+    Reads approved/denied/exclude codes from clean.yaml.
+    Returns filtered DataFrame with approved_flag (Int8: 1=approved, 0=denied).
+    """
+    action_cfg = cfg_clean["clean"]["action_taken"]
+    approved = set(action_cfg["approved"])
+    denied = set(action_cfg["denied"])
+    valid = approved | denied
+
+    # Select only the observations that have codes matching approved or denied actions
+    mask = df["action_taken"].isin(valid)
+    df_out = df.loc[mask].copy()
+
+    # We don't overwrite action_taken in case we want to further analyze the data later
+    df_out["approved_flag"] = df_out["action_taken"].isin(approved).astype("bool[pyarrow]")
+
+    return df_out
