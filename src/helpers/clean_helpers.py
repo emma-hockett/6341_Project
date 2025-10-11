@@ -1,6 +1,7 @@
 # src/helpers/clean_helpers.py
 import pandas as pd
-from pandas.api.types import is_string_dtype
+from pandas.api.types import is_string_dtype, is_object_dtype
+import src.utils.file_utils as fu
 
 
 def quick_null_like_check(df: pd.DataFrame, null_like, sample_frac: float = 0.01, random_state: int = 0) -> pd.Series:
@@ -134,3 +135,59 @@ def apply_action_taken_flag(df: pd.DataFrame, cfg_clean: dict) -> pd.DataFrame:
     df_out["approved_flag"] = df_out["action_taken"].isin(approved).astype("bool[pyarrow]")
 
     return df_out
+
+
+def generate_schema_summary(df: pd.DataFrame, cfg_schema: dict, path_key: str = "schema_summary") -> pd.DataFrame:
+    """
+    Build column-level metadata for ALL columns currently in df (including derived ones like *_exempt, approved_flag).
+    Skips columns with role: drop (per schema). Writes CSV to the path resolved by `path_key` in paths.yaml.
+    Columns: column_name, data_type, missing_pct, unique_count, sample_value, notes
+    """
+    cols_spec = (cfg_schema.get("columns") or {})
+    rows = []
+    n_rows = len(df)
+
+    for col in df.columns:
+        spec = cols_spec.get(col, {}) if isinstance(cols_spec, dict) else {}
+        if spec.get("role") == "drop":
+            continue
+
+        s = df[col]
+        data_type = str(s.dtype)
+        missing_pct = float(s.isna().mean() * 100.0) if n_rows else 0.0
+        unique_count = int(s.nunique(dropna=True))
+
+        # sample value from first non-null (stringify to be CSV-safe)
+        if unique_count > 0:
+            idx = s.first_valid_index()
+            sample_value = s.loc[idx] if idx is not None else None
+        else:
+            sample_value = None
+
+        # normalize sample to a short string for CSV readability
+        if pd.isna(sample_value):
+            sample_value_str = ""
+        else:
+            sv = sample_value
+            # shorten long strings
+            sv = str(sv)
+            sample_value_str = sv if len(sv) <= 120 else (sv[:117] + "...")
+
+        rows.append({
+            "column_name": col,
+            "data_type": data_type,
+            "missing_pct": round(missing_pct, 6),
+            "unique_count": unique_count,
+            "sample_value": sample_value_str,
+            "notes": spec.get("notes", ""),
+        })
+
+    summary = pd.DataFrame(rows, columns=[
+        "column_name", "data_type", "missing_pct", "unique_count", "sample_value", "notes"
+    ])
+
+    out_path = fu.get_path(path_key)
+    summary.to_csv(out_path, index=False)
+    print(f"Wrote schema summary to {out_path}  ({len(summary)} columns)")
+
+    return summary
