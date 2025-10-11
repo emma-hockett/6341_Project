@@ -1,1 +1,2 @@
 hmda_raw: "data/interim/2024_combined_mlar_header.parquet"
+hmda_2024_typed: "data/interim/hmda_2024_typed.parquet"
