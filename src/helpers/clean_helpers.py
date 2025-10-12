@@ -1,34 +1,50 @@
 # src/helpers/clean_helpers.py
 import pandas as pd
-from pandas.api.types import is_string_dtype, is_object_dtype
+from pandas.api.types import is_string_dtype
 import src.utils.file_utils as fu
 
 
-def quick_null_like_check(df: pd.DataFrame, null_like, sample_frac: float = 0.01, random_state: int = 0) -> pd.Series:
-    tokens = [str(t).strip().casefold() for t in (null_like or []) if t is not None]
-    tokens = list(dict.fromkeys(tokens))
-    if not tokens:
+def null_like_check(df: pd.DataFrame, null_like_values) -> pd.Series:
+    """
+    For each column in df:
+      - verify it is of type string
+      - force the string values to lowercase
+      - check if any column values are null-like
+      - calculate the proportion of column values that are null-like, if any
+    Returns pd.Series with null-like value proportions greater than zero
+    """
+
+    # Parse list of values representing null values
+    null_like_tokens = [str(t).strip().casefold() for t in (null_like_values or []) if t is not None]
+    null_like_tokens = list(dict.fromkeys(null_like_tokens))
+    if not null_like_tokens:
         return pd.Series(dtype="float64", name="null_like_fraction")
 
-    hits = {}
+    columns_with_null_like = {}
+
+    # We want to iterate through all columns for null-like values
     for col in df.columns:
         s = df[col]
-        if not is_string_dtype(s.dtype):
+        if not is_string_dtype(s.dtype): # We're only checking stringy values
             continue
 
-        ss = s.sample(frac=sample_frac, random_state=random_state) if 0 < sample_frac < 1.0 else s
-        norm = ss.str.casefold()
+        # For efficiency, take a sample of the column's values. We're looking for patterns of token use.
+        s_sample = s.sample(frac=0.01, random_state=0)
 
-        nn = norm[norm.notna()]
-        if nn.empty:
+        # We force everything to lowercase so that we don't have to test variations based on case
+        s_sample_lowercase = s_sample.str.casefold()
+        non_null_s = s_sample_lowercase[s_sample_lowercase.notna()]
+        if non_null_s.empty:
             continue
 
-        match = nn.isin(tokens)
+        # If the value is in our list of null-like strings, we have a match
+        match = non_null_s.isin(null_like_tokens)
 
+        # If the column has any matches, calculate the proportion
         if match.any():
-            hits[col] = float(match.sum()) / float(len(ss))
+            columns_with_null_like[col] = float(match.sum()) / float(len(s_sample))
 
-    return pd.Series(hits, name="null_like_fraction").sort_values(ascending=False)
+    return pd.Series(columns_with_null_like, name="null_like_fraction").sort_values(ascending=False)
 
 
 def apply_exempt_split(df: pd.DataFrame, exempt_cols: list[str]) -> list[str]:
@@ -38,14 +54,15 @@ def apply_exempt_split(df: pd.DataFrame, exempt_cols: list[str]) -> list[str]:
       - set base column cells to <NA> where exempt
     Returns list of created flag column names.
     """
-    created = []
+    created = [] # The new _exempt columns created
     for col in exempt_cols:
         if col not in df.columns:
             continue
         s = df[col]
 
-        norm = s.str.strip().str.casefold()
-        mask = norm.eq("exempt")
+        # Find the values within the column with a value of exempt
+        non_null_s = s.str.strip().str.casefold()
+        mask = non_null_s.eq("exempt")
 
         flag_col = f"{col}_exempt"
         df[flag_col] = mask.astype("boolean[pyarrow]")
@@ -58,31 +75,32 @@ def apply_exempt_split(df: pd.DataFrame, exempt_cols: list[str]) -> list[str]:
 
     return created
 
-def convert_by_schema(df: pd.DataFrame, cfg_schema: dict, *, in_place: bool = True) -> pd.DataFrame:
+def convert_by_schema(df: pd.DataFrame, cfg_schema: dict) -> pd.DataFrame:
     """
     Convert columns to the exact dtypes specified in schema.yaml
     - If column is string, uses vectorized string ops, then parses
     - Emits a warning count of new nulls created by coercion
     """
-    out = df if in_place else df.copy()
+    out = df
     cols_spec = (cfg_schema.get("columns") or {})
 
     for col, spec in cols_spec.items():
         if not isinstance(spec, dict):
             continue
-        if spec.get("role") == "drop":
+        if spec.get("role") == "drop": # Skip the dropped columns
             continue
-        if col not in out.columns:
+        if col not in out.columns: # Don't convert anything we don't have a definition for
             continue
 
-        target = str(spec.get("dtype", ""))
+        target = str(spec.get("dtype", "")) # Get the to-be dtype
         if not target:
             continue
 
         s = out[col]
-        before_na = s.isna().sum()
+        before_na = s.isna().sum() # Used to make sure we aren't accidentally creating null values during conversion
 
         try:
+            # In this dataset, everything is string by default.  We don't have conversions other than numeric.
             if target.startswith(("Int", "Float")):
                 out[col] = pd.to_numeric(s, errors="coerce").astype(target)
 
