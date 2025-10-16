@@ -150,7 +150,7 @@ def apply_action_taken_flag(df: pd.DataFrame, cfg_clean: dict) -> pd.DataFrame:
     df_out = df.loc[mask].copy()
 
     # We don't overwrite action_taken in case we want to further analyze the data later
-    df_out["approved_flag"] = df_out["action_taken"].isin(approved).astype("bool[pyarrow]")
+    df_out["denied_flag"] = df_out["action_taken"].isin(denied).astype("bool[pyarrow]")
 
     return df_out
 
