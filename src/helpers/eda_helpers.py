@@ -88,3 +88,25 @@ def plot_numeric_features(df: pd.DataFrame, numeric_cols_to_review: pd.DataFrame
         # Adjust layout
         plt.subplots_adjust(left=0.08, right=0.95, wspace=0.4)
         plt.show()
+
+
+def get_categorical_columns_requiring_review(df: pd.DataFrame, category_cols: list[str], category_min_pct_threshold: float) -> pd.DataFrame:
+    low_frequency_features = []
+    for col in category_cols:
+        counts = df[col].value_counts(dropna=False)
+        n_unique = counts.size
+        min_freq = counts.min()
+
+        # We calculate the minimum percentage of observed values
+        valid = df[col].notna().sum()
+        min_pct = min_freq / valid if valid > 0 else 0
+
+        if min_pct < 0.001:
+            low_frequency_features.append({
+                "feature": col,
+                "n_unique": n_unique,
+                "min_freq": min_freq,
+                "min_pct": min_pct
+            })
+
+    return pd.DataFrame(low_frequency_features)

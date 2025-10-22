@@ -62,7 +62,7 @@ def apply_exempt_split(df: pd.DataFrame, exempt_cols: list[str]) -> list[str]:
 
         # Find the values within the column with a value of exempt
         non_null_s = s.str.strip().str.casefold()
-        mask = non_null_s.eq("exempt")
+        mask = non_null_s.isin(["exempt", "1111"])
 
         flag_col = f"{col}_exempt"
         df[flag_col] = mask.astype("boolean[pyarrow]")

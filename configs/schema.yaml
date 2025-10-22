@@ -201,14 +201,17 @@ columns:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   co_applicant_credit_scoring_model:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   denial_reason_1:
     role: drop
     type: string
     dtype: string
+    exempt: true
   denial_reason_2:
     role: drop
     type: string
@@ -263,35 +266,39 @@ columns:
     exempt: true
   combined_loan_to_value_ratio:
     role: feature
-    type: categorical
-    dtype: string
+    type: numeric
+    dtype: Float32
     exempt: true
   loan_term:
     role: feature
-    type: categorical
-    dtype: string
+    type: numeric
+    dtype: Int16
     exempt: true
   intro_rate_period:
     role: feature
-    type: categorical
-    dtype: string
+    type: numeric
+    dtype: Float64
     exempt: true
   balloon_payment:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   interest_only_payment:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   negative_amortization:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   other_non_amortizing_features:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   property_value:
     role: feature
     type: numeric
@@ -301,6 +308,7 @@ columns:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   manufactured_home_land_property_interest:
     role: feature
     type: categorical
@@ -311,17 +319,19 @@ columns:
     dtype: string
   multifamily_affordable_units:
     role: feature
-    type: categorical
+    type: numeric
     dtype: Int16
     exempt: true
   submission_of_application:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   initially_payable_to_institution:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   aus_1:
     role: drop
     type: string
@@ -346,11 +356,14 @@ columns:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   open_end_line_of_credit:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   business_or_commercial_purpose:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
