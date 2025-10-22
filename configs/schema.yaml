@@ -18,11 +18,11 @@ columns:
   preapproval:
     role: feature
     type: categorical
-    dtype: Int16
+    dtype: Bool
   construction_method:
     role: feature
     type: categorical
-    dtype: Int16
+    dtype: Bool
   occupancy_type:
     role: feature
     type: categorical
@@ -196,7 +196,7 @@ columns:
   lien_status:
     role: feature
     type: categorical
-    dtype: Int16
+    dtype: Bool
   applicant_credit_scoring_model:
     role: feature
     type: categorical
@@ -282,22 +282,22 @@ columns:
   balloon_payment:
     role: feature
     type: categorical
-    dtype: Int16
+    dtype: Bool
     exempt: true
   interest_only_payment:
     role: feature
     type: categorical
-    dtype: Int16
+    dtype: Bool
     exempt: true
   negative_amortization:
     role: feature
     type: categorical
-    dtype: Int16
+    dtype: Bool
     exempt: true
   other_non_amortizing_features:
     role: feature
     type: categorical
-    dtype: Int16
+    dtype: Bool
     exempt: true
   property_value:
     role: feature
@@ -355,15 +355,15 @@ columns:
   reverse_mortgage:
     role: feature
     type: categorical
-    dtype: Int16
+    dtype: Bool
     exempt: true
   open_end_line_of_credit:
     role: feature
     type: categorical
-    dtype: Int16
+    dtype: Bool
     exempt: true
   business_or_commercial_purpose:
     role: feature
     type: categorical
-    dtype: Int16
+    dtype: Bool
     exempt: true

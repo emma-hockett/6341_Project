@@ -100,9 +100,11 @@ def convert_by_schema(df: pd.DataFrame, cfg_schema: dict) -> pd.DataFrame:
         before_na = s.isna().sum() # Used to make sure we aren't accidentally creating null values during conversion
 
         try:
-            # In this dataset, everything is string by default.  We don't have conversions other than numeric.
+            # In this dataset, everything is string by default.
             if target.startswith(("Int", "Float")):
                 out[col] = pd.to_numeric(s, errors="coerce").astype(target)
+            elif target.startswith("Bool"):
+                out[col] = pd.to_bool(s, errors="coerce").astype(target)
 
             # Report new nulls introduced by coercion
             after_na = out[col].isna().sum()
