@@ -1,0 +1,4 @@
+eda:
+  skew_threshold: 0.5
+  kurtosis_threshold: 3
+  outlier_threshold: 0.05
