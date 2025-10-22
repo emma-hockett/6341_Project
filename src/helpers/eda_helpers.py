@@ -110,3 +110,44 @@ def get_categorical_columns_requiring_review(df: pd.DataFrame, category_cols: li
             })
 
     return pd.DataFrame(low_frequency_features)
+
+
+
+def identify_perfect_category_classes(df, category_cols, target):
+    MIN_N = 50
+    rows = []
+    for col in category_cols:
+        g = df.groupby(col, dropna=False)[target].agg(rate='mean', n='count')
+        if len(g) < 2:
+            continue
+        mask = ((g['rate'] == 0) | (g['rate'] == 1)) & (g['n'] >= MIN_N)
+        if mask.any():
+            for cls, r in g[mask].iterrows():
+                rows.append({'feature': col, 'class_label': cls, 'n': int(r['n']), 'denial_rate': r['rate']})
+    out = pd.DataFrame(rows)
+    if not out.empty:
+        out = out.sort_values(['feature','denial_rate','n'], ascending=[True, True, False]).reset_index(drop=True)
+    return out
+
+
+def identify_categories_with_large_denial_ranges(df, category_cols, target):
+    RANGE_T = 0.15
+    rows = []
+    for col in category_cols:
+        g = df.groupby(col, dropna=False)[target].agg(rate='mean', n='count')
+        if len(g) < 2:
+            continue
+        rmin, rmax = g['rate'].min(), g['rate'].max()
+        frange = rmax - rmin
+        if frange > RANGE_T:
+            rows.append({
+                'feature': col,
+                'n_classes': len(g),
+                'min_rate': rmin,
+                'max_rate': rmax,
+                'feature_range': frange
+            })
+    out = pd.DataFrame(rows)
+    if not out.empty:
+        out = out.sort_values('feature_range', ascending=False).reset_index(drop=True)
+    return out
