@@ -73,7 +73,7 @@ def save_parquet(df, key: str) -> Path:
     """
     output_path = get_path(key)
 
-    df.to_parquet(output_path, index=False, engine="pyarrow")
+    df.to_parquet(output_path, index=False, engine="pyarrow", compression="snappy")
     print(f"Saved to {output_path}")
 
     return output_path
