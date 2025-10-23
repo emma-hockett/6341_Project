@@ -62,7 +62,7 @@ def apply_exempt_split(df: pd.DataFrame, exempt_cols: list[str]) -> list[str]:
 
         # Find the values within the column with a value of exempt
         non_null_s = s.str.strip().str.casefold()
-        mask = non_null_s.eq("exempt")
+        mask = non_null_s.isin(["exempt", "1111"])
 
         flag_col = f"{col}_exempt"
         df[flag_col] = mask.astype("boolean[pyarrow]")
@@ -100,9 +100,12 @@ def convert_by_schema(df: pd.DataFrame, cfg_schema: dict) -> pd.DataFrame:
         before_na = s.isna().sum() # Used to make sure we aren't accidentally creating null values during conversion
 
         try:
-            # In this dataset, everything is string by default.  We don't have conversions other than numeric.
+            # In this dataset, everything is string by default.
             if target.startswith(("Int", "Float")):
                 out[col] = pd.to_numeric(s, errors="coerce").astype(target)
+            elif target.startswith("Bool"):
+                out[col] = s.map({"1": True, "2": False})
+                out[col] = out[col].astype("boolean")
 
             # Report new nulls introduced by coercion
             after_na = out[col].isna().sum()
