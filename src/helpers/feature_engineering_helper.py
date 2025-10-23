@@ -20,7 +20,7 @@ def generate_multi_hot_features(df: pd.DataFrame, cfg: Dict, prefix: str) -> pd.
     for label, codes in code_map.items():
         col_name = f"{prefix}{label}"
         mask = slots.isin(codes).any(axis=1)
-        df[col_name] = mask.astype("UInt8")
+        df[col_name] = mask.astype("boolean[pyarrow]")
         out_cols.append(col_name)
 
     return df
