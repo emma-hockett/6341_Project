@@ -52,3 +52,28 @@ def impute_income(df: pd.DataFrame) -> pd.DataFrame:
     # Drop temporary columns
     df = df.drop(columns=["income_to_loan_ratio", "median_ratio"])
     return df
+
+
+def impute_property_value(df: pd.DataFrame) -> pd.DataFrame:
+    # Compute LTV ratio
+    df["loan_to_value_ratio"] = df["loan_amount"] / df["property_value"]
+
+    # Calculate median LTV ratio by loan_type
+    ltv_medians = (
+        df.loc[df["loan_to_value_ratio"].notna()]
+            .groupby("loan_type")["loan_to_value_ratio"]
+            .median()
+    )
+
+    # Map median ratios back to each row
+    df["median_ltv_ratio"] = df["loan_type"].map(ltv_medians)
+
+    # Impute property_value where missing
+    mask = df["property_value"].isna() & df["loan_amount"].notna()
+    df.loc[mask, "property_value"] = (
+        df.loc[mask, "loan_amount"] / df.loc[mask, "median_ltv_ratio"]
+    )
+
+    # Drop temporary columns
+    df = df.drop(columns=["loan_to_value_ratio", "median_ltv_ratio"])
+    return df
