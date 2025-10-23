@@ -104,7 +104,8 @@ def convert_by_schema(df: pd.DataFrame, cfg_schema: dict) -> pd.DataFrame:
             if target.startswith(("Int", "Float")):
                 out[col] = pd.to_numeric(s, errors="coerce").astype(target)
             elif target.startswith("Bool"):
-                out[col] = pd.to_bool(s, errors="coerce").astype(target)
+                out[col] = s.map({"1": True, "2": False})
+                out[col] = out[col].astype("boolean")
 
             # Report new nulls introduced by coercion
             after_na = out[col].isna().sum()
