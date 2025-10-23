@@ -17,14 +17,30 @@ This document describes the typed and cleaned dataset at data/interim/hmda_2024_
 | loan_amount | Float32 | Loan amount as reported. | Typed; numeric cleaning. | Positive numeric. |
 | action_taken | category | Lender’s action/outcome for the application. | Cast to categorical. | Used to derive `approved_flag`. |
 | state_code | category | State/territory code of the property. | Cast to categorical; trimmed. | Code string. |
-| county_code | category | County code of the property. | Cast to categorical; trimmed. | Code string; has `_exempt` flag. |
+| county_code | category | County code of the property. | Cast to categorical; trimmed. | Code string; has `_exempt` flag. Has corresponding *_exempt flag. |
 | census_tract | category | Census tract identifier for the property. | Cast to categorical; trimmed. | Code string. |
-| applicant_ethnicity_1..5 | category | Applicant ethnicity fields (multiple responses). | Cast to categorical. | Encoded numeric categories. |
-| co_applicant_ethnicity_1..5 | category | Co-applicant ethnicity fields (multiple responses). | Cast to categorical. | Encoded numeric categories. |
+| applicant_ethnicity_1 | category | Applicant ethnicity (slot-specific code field). | Cast to categorical. | Encoded numeric category in source. |
+| applicant_ethnicity_2 | category | Applicant ethnicity (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| applicant_ethnicity_3 | category | Applicant ethnicity (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| applicant_ethnicity_4 | category | Applicant ethnicity (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| applicant_ethnicity_5 | category | Applicant ethnicity (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| co_applicant_ethnicity_1 | category | Co-applicant ethnicity (slot-specific code field). | Cast to categorical. | Encoded numeric category in source. |
+| co_applicant_ethnicity_2 | category | Co-applicant ethnicity (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| co_applicant_ethnicity_3 | category | Co-applicant ethnicity (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| co_applicant_ethnicity_4 | category | Co-applicant ethnicity (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| co_applicant_ethnicity_5 | category | Co-applicant ethnicity (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
 | applicant_ethnicity_observed | category | Whether applicant ethnicity was observed or reported. | Cast to categorical. | Encoded numeric category. |
 | co_applicant_ethnicity_observed | category | Whether co-applicant ethnicity was observed or reported. | Cast to categorical. | Encoded numeric category. |
-| applicant_race_1..5 | category | Applicant race fields (multiple responses). | Cast to categorical. | Encoded numeric categories. |
-| co_applicant_race_1..5 | category | Co-applicant race fields (multiple responses). | Cast to categorical. | Encoded numeric categories. |
+| applicant_race_1 | category | Applicant race (slot-specific code field). | Cast to categorical. | Encoded numeric category in source. |
+| applicant_race_2 | category | Applicant race (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| applicant_race_3 | category | Applicant race (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| applicant_race_4 | category | Applicant race (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| applicant_race_5 | category | Applicant race (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| co_applicant_race_1 | category | Co-applicant race (slot-specific code field). | Cast to categorical. | Encoded numeric category in source. |
+| co_applicant_race_2 | category | Co-applicant race (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| co_applicant_race_3 | category | Co-applicant race (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| co_applicant_race_4 | category | Co-applicant race (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
+| co_applicant_race_5 | category | Co-applicant race (slot-specific code field). | Cast to categorical. | Mostly null by design (rare multi-response slot). |
 | applicant_race_observed | category | Whether applicant race was observed or reported. | Cast to categorical. | Encoded numeric category. |
 | co_applicant_race_observed | category | Whether co-applicant race was observed or reported. | Cast to categorical. | Encoded numeric category. |
 | applicant_sex | category | Applicant sex. | Cast to categorical. | Encoded numeric category. |
@@ -41,9 +57,9 @@ This document describes the typed and cleaned dataset at data/interim/hmda_2024_
 | co_applicant_credit_scoring_model | category | Credit score model used for co-applicant. | Cast to categorical. | Encoded numeric category. |
 | prepayment_penalty_term | category | Prepayment penalty term (coded, may be exempt). | Cast to categorical. | Has `_exempt` flag. |
 | debt_to_income_ratio | category | DTI ratio band (coded). | Cast to categorical. | Has `_exempt` flag. |
-| combined_loan_to_value_ratio | category | CLTV ratio band (coded). | Cast to categorical. | Has `_exempt` flag. |
-| loan_term | category | Loan term (months band/coded). | Cast to categorical. | Has `_exempt` flag. |
-| intro_rate_period | category | Introductory rate period (months band/coded). | Cast to categorical. | Has `_exempt` flag. |
+| combined_loan_to_value_ratio | Float32 | CLTV ratio band (coded). | Cast to categorical. | Has `_exempt` flag. |
+| loan_term | Int16 | Loan term (months band/coded). | Cast to categorical. | Has `_exempt` flag. |
+| intro_rate_period | Float64 | Introductory rate period (months band/coded). | Cast to categorical. | Has `_exempt` flag. |
 | balloon_payment | category | Balloon payment feature. | Cast to categorical. | Encoded numeric category. |
 | interest_only_payment | category | Interest-only payment feature. | Cast to categorical. | Encoded numeric category. |
 | negative_amortization | category | Negative amortization feature. | Cast to categorical. | Encoded numeric category. |
@@ -52,25 +68,37 @@ This document describes the typed and cleaned dataset at data/interim/hmda_2024_
 | manufactured_home_secured_property_type | category | Secured property type (for manufactured housing). | Cast to categorical. | Encoded numeric category. |
 | manufactured_home_land_property_interest | category | Land property interest (manufactured housing). | Cast to categorical. | Encoded numeric category. |
 | total_units | category | Total dwelling units on the property. | Cast to categorical. | Count band/coded. |
-| multifamily_affordable_units | category | Number of affordable units (for multifamily). | Cast to categorical; exempt split applied. | Has `_exempt` flag. |
+| multifamily_affordable_units | Int16 | Number of affordable units (for multifamily). | Cast to categorical; exempt split applied. | Has `_exempt` flag. |
 | submission_of_application | category | Submission channel (e.g., direct, retail). | Cast to categorical. | Encoded numeric category. |
 | initially_payable_to_institution | category | Whether the loan is initially payable to the institution. | Cast to categorical. | Encoded numeric category. |
 | reverse_mortgage | category | Whether the loan is a reverse mortgage. | Cast to categorical. | Encoded numeric category. |
 | open_end_line_of_credit | category | Whether the loan is an open-end line of credit. | Cast to categorical. | Encoded numeric category. |
 | business_or_commercial_purpose | category | Whether loan purpose is business/commercial. | Cast to categorical. | Encoded numeric category. |
+| applicant_credit_scoring_model_exempt | bool[pyarrow] | Exempt flag for `applicant_credit_scoring_model`; True when reporter marked the field as 'Exempt' in HMDA. | Derived boolean; created during exempt split; base value set to null when True. | Corollary of exempt handling; informative for modeling. |
+| balloon_payment_exempt | bool[pyarrow] | Exempt flag for `balloon_payment`; True when reporter marked the field as 'Exempt' in HMDA. | Derived boolean; created during exempt split; base value set to null when True. | Corollary of exempt handling; informative for modeling. |
+| business_or_commercial_purpose_exempt | bool[pyarrow] | Exempt flag for `business_or_commercial_purpose`; True when reporter marked the field as 'Exempt' in HMDA. | Derived boolean; created during exempt split; base value set to null when True. | Corollary of exempt handling; informative for modeling. |
+| co_applicant_credit_scoring_model_exempt | bool[pyarrow] | Exempt flag for `co_applicant_credit_scoring_model`; True when reporter marked the field as 'Exempt' in HMDA. | Derived boolean; created during exempt split; base value set to null when True. | Corollary of exempt handling; informative for modeling. |
 | combined_loan_to_value_ratio_exempt | bool[pyarrow] | Flag: CLTV reported as “Exempt”. | Derived from exempt split. | Companion to `combined_loan_to_value_ratio`. |
 | county_code_exempt | bool[pyarrow] | Flag: County code reported as “Exempt”. | Derived from exempt split. | Companion to `county_code`. |
 | debt_to_income_ratio_exempt | bool[pyarrow] | Flag: DTI reported as “Exempt”. | Derived from exempt split. | Companion to `debt_to_income_ratio`. |
+| initially_payable_to_institution_exempt | bool[pyarrow] | Exempt flag for `initially_payable_to_institution`; True when reporter marked the field as 'Exempt' in HMDA. | Derived boolean; created during exempt split; base value set to null when True. | Corollary of exempt handling; informative for modeling. |
+| interest_only_payment_exempt | bool[pyarrow] | Exempt flag for `interest_only_payment`; True when reporter marked the field as 'Exempt' in HMDA. | Derived boolean; created during exempt split; base value set to null when True. | Corollary of exempt handling; informative for modeling. |
 | intro_rate_period_exempt | bool[pyarrow] | Flag: Intro rate period reported as “Exempt”. | Derived from exempt split. | Companion to `intro_rate_period`. |
 | loan_term_exempt | bool[pyarrow] | Flag: Loan term reported as “Exempt”. | Derived from exempt split. | Companion to `loan_term`. |
+| manufactured_home_secured_property_type_exempt | bool[pyarrow] | Exempt flag for `manufactured_home_secured_property_type`; True when reporter marked the field as 'Exempt' in HMDA. | Derived boolean; created during exempt split; base value set to null when True. | Corollary of exempt handling; informative for modeling. |
 | multifamily_affordable_units_exempt | bool[pyarrow] | Flag: Affordable units reported as “Exempt”. | Derived from exempt split. | Companion to `multifamily_affordable_units`. |
+| negative_amortization_exempt | bool[pyarrow] | Exempt flag for `negative_amortization`; True when reporter marked the field as 'Exempt' in HMDA. | Derived boolean; created during exempt split; base value set to null when True. | Corollary of exempt handling; informative for modeling. |
+| open_end_line_of_credit_exempt | bool[pyarrow] | Exempt flag for `open_end_line_of_credit`; True when reporter marked the field as 'Exempt' in HMDA. | Derived boolean; created during exempt split; base value set to null when True. | Corollary of exempt handling; informative for modeling. |
+| other_non_amortizing_features_exempt | bool[pyarrow] | Exempt flag for `other_non_amortizing_features`; True when reporter marked the field as 'Exempt' in HMDA. | Derived boolean; created during exempt split; base value set to null when True. | Corollary of exempt handling; informative for modeling. |
 | prepayment_penalty_term_exempt | bool[pyarrow] | Flag: Prepayment penalty term reported as “Exempt”. | Derived from exempt split. | Companion to `prepayment_penalty_term`. |
 | property_value_exempt | bool[pyarrow] | Flag: Property value reported as “Exempt”. | Derived from exempt split. | Companion to `property_value`. |
-| approved_flag | bool[pyarrow] | Binary target: lender approval decision for modeling. | Derived from `action_taken` via clean config. | See “Target Variable” section. |
+| reverse_mortgage_exempt | bool[pyarrow] | Exempt flag for `reverse_mortgage`; True when reporter marked the field as 'Exempt' in HMDA. | Derived boolean; created during exempt split; base value set to null when True. | Corollary of exempt handling; informative for modeling. |
+| submission_of_application_exempt | bool[pyarrow] | Exempt flag for `submission_of_application`; True when reporter marked the field as 'Exempt' in HMDA. | Derived boolean; created during exempt split; base value set to null when True. | Corollary of exempt handling; informative for modeling. |
+| denied_flag | bool[pyarrow] | Binary target: 1 if loan was denied; 0 otherwise. | Typed boolean. |  |
 ## Target Variable
 
-Column: approved_flag</br>
-Definition: True = approved, False = denied (used only for rows where a lender decision exists).
+Column: denied_flag</br>
+Definition: True = denied, False = approved (used only for rows where a lender decision exists).
 
 Mapping source: clean.yaml
 - Approved: action_taken ∈ {1, 2, 8}
