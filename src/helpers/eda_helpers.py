@@ -5,6 +5,8 @@ import src.utils.schema_utils as su
 import src.utils.file_utils as fu
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.stats as stats
+from scipy.stats import pointbiserialr
 
 
 def get_numeric_features(df: pd.DataFrame, cfg_schema:object) -> pd.Series:
@@ -154,8 +156,8 @@ def identify_categories_with_large_denial_ranges(df, category_cols, target):
     return out
 
 
-def identify_highly_correlated_numeric_features(df: pd.DataFrame, category_cols: list[str], target):
-    corr_matrix = df[category_cols].corr(method='pearson').abs()
+def identify_highly_correlated_numeric_features(df: pd.DataFrame, numeric_cols: list[str]):
+    corr_matrix = df[numeric_cols].corr(method='pearson').abs()
 
     high_corr = (
         corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
@@ -164,3 +166,34 @@ def identify_highly_correlated_numeric_features(df: pd.DataFrame, category_cols:
         .rename(columns={'level_0': 'feature_1', 'level_1': 'feature_2', 0: 'corr'})
     )
     return high_corr[high_corr['corr'] > 0.8].sort_values('corr', ascending=False)
+
+
+def identify_feature_target_correlations(df: pd.DataFrame, numeric_cols: list[str], target: str):
+    results_num = []
+    for col in numeric_cols:
+        # Drop NaNs for valid pairs
+        valid = df[[col, target]].dropna()
+        if valid[col].nunique() > 1:
+            r, p = pointbiserialr(valid[col], valid[target])
+            results_num.append({'feature': col, 'corr': r, 'p_value': p})
+
+    return pd.DataFrame(results_num).sort_values('corr', key=abs, ascending=False)
+
+
+def cramers_v(x, y):
+    confusion = pd.crosstab(x, y)
+    chi2 = stats.chi2_contingency(confusion)[0]
+    n = confusion.sum().sum()
+    phi2 = chi2 / n
+    r, k = confusion.shape
+    return np.sqrt(phi2 / min(k - 1, r - 1))
+
+
+def identify_feature_target_correlations(df: pd.DataFrame, category_cols: list[str], target: str):
+    results_cat = []
+    for col in category_cols:
+        if df[col].nunique() > 1:
+            v = cramers_v(df[col].astype(str), df[target])
+            results_cat.append({'feature': col, 'cramers_v': v})
+
+    return pd.DataFrame(results_cat).sort_values('cramers_v', ascending=False)
