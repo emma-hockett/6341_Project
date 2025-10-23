@@ -4,6 +4,7 @@ from scipy.stats import skew, kurtosis
 import src.utils.schema_utils as su
 import src.utils.file_utils as fu
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def get_numeric_features(df: pd.DataFrame, cfg_schema:object) -> pd.Series:
@@ -151,3 +152,15 @@ def identify_categories_with_large_denial_ranges(df, category_cols, target):
     if not out.empty:
         out = out.sort_values('feature_range', ascending=False).reset_index(drop=True)
     return out
+
+
+def identify_highly_correlated_numeric_features(df: pd.DataFrame, category_cols: list[str], target):
+    corr_matrix = df[category_cols].corr(method='pearson').abs()
+
+    high_corr = (
+        corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+        .stack()
+        .reset_index()
+        .rename(columns={'level_0': 'feature_1', 'level_1': 'feature_2', 0: 'corr'})
+    )
+    return high_corr[high_corr['corr'] > 0.8].sort_values('corr', ascending=False)
