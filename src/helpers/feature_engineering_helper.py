@@ -1,7 +1,8 @@
 # src/helpers/eda_helpers.py
 import pandas as pd
 from typing import Dict, List
-from pathlib import Path
+from sklearn.preprocessing import OneHotEncoder
+import numpy as np
 from sklearn.model_selection import train_test_split
 import src.utils.file_utils as fu
 
@@ -20,7 +21,7 @@ def generate_multi_hot_features(df: pd.DataFrame, cfg: Dict, prefix: str) -> pd.
     for label, codes in code_map.items():
         col_name = f"{prefix}{label}"
         mask = slots.isin(codes).any(axis=1)
-        df[col_name] = mask.astype("boolean[pyarrow]")
+        df[col_name] = mask.astype("int8[pyarrow]").fillna(-1)
         out_cols.append(col_name)
 
     return df
@@ -102,3 +103,17 @@ def create_train_test_splits(df: pd.DataFrame):
 
     print(f"Train indices saved to: {train_output_path / 'train_index.csv'}")
     print(f"Test indices saved to:  {test_output_path / 'test_index.csv'}")
+
+
+def one_hot_encode(df: pd.DataFrame) -> pd.DataFrame:
+    # Get the categorical features
+    cat_cols = df.select_dtypes(include=["string"]).columns
+
+    # Create and fit a one hot encoder
+    ohe = OneHotEncoder(handle_unknown="ignore", sparse_output=False, dtype=np.uint8)
+    ohe_array = ohe.fit_transform(df[cat_cols])
+
+    # Merge encoded columns into original data frame
+    ohe_cols = ohe.get_feature_names_out(cat_cols)
+    df_ohe = pd.DataFrame(ohe_array, columns=ohe_cols, index=df.index)
+    return pd.concat([df.drop(columns=cat_cols), df_ohe], axis=1)

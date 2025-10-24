@@ -256,8 +256,8 @@ columns:
     exempt: true
   prepayment_penalty_term:
     role: feature
-    type: categorical
-    dtype: string
+    type: numeric
+    dtype: Int16
     exempt: true
   debt_to_income_ratio:
     role: feature
