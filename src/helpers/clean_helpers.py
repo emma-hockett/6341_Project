@@ -48,12 +48,6 @@ def null_like_check(df: pd.DataFrame, null_like_values) -> pd.Series:
 
 
 def apply_exempt_split(df: pd.DataFrame, exempt_cols: list[str]) -> list[str]:
-    """
-    For each column in exempt_cols:
-      - create <col>_exempt (nullable boolean) True where value == 'exempt' (case-insensitive, after strip)
-      - set base column cells to <NA> where exempt
-    Returns list of created flag column names.
-    """
     created = [] # The new _exempt columns created
     for col in exempt_cols:
         if col not in df.columns:
@@ -61,15 +55,21 @@ def apply_exempt_split(df: pd.DataFrame, exempt_cols: list[str]) -> list[str]:
         s = df[col]
 
         # Find the values within the column with a value of exempt
-        non_null_s = s.str.strip().str.casefold()
-        mask = non_null_s.isin(["exempt", "1111"])
+        non_null_s = s.str.casefold()
+        mask_exempt = non_null_s.isin(["exempt", "1111"])
+        mask_missing = s.isna()
 
         flag_col = f"{col}_exempt"
-        df[flag_col] = mask.astype("boolean[pyarrow]")
 
-        # Fill the cells that had been exempt with pd.NA
-        if mask.any():
-            df.loc[mask, col] = pd.NA
+        flag = pd.Series(0, index=s.index, dtype="int8[pyarrow]")
+        flag.loc[mask_exempt] = 1
+        flag.loc[mask_missing] = -1
+        df[flag_col] = flag
+
+        # Replace exempt entries in the source with -1
+        if mask_exempt.any():
+            df.loc[mask_exempt, col] = "NA"
+        df[col] = df[col]
 
         created.append(flag_col)
 
@@ -104,14 +104,7 @@ def convert_by_schema(df: pd.DataFrame, cfg_schema: dict) -> pd.DataFrame:
             if target.startswith(("Int", "Float")):
                 out[col] = pd.to_numeric(s, errors="coerce").astype(target)
             elif target.startswith("Bool"):
-                out[col] = s.map({"1": True, "2": False})
-                out[col] = out[col].astype("boolean")
-
-            # Report new nulls introduced by coercion
-            after_na = out[col].isna().sum()
-            n_fail = int(after_na - before_na)
-            if n_fail > 0:
-                print(f"{col}: {n_fail} values could not be converted to {target}")
+                out[col] = s.map({"1": 1, "2": 0}).fillna(-1).astype("int8[pyarrow]")
 
         except Exception as e:
             print(f"{col}: failed to convert to {target} ({type(e).__name__}: {e})")
@@ -127,22 +120,7 @@ def strip_string_columns_inplace(df: pd.DataFrame) -> None:
             df[col] = s.str.strip()
 
 
-def to_pandas_categoricals(df: pd.DataFrame, cat_cols: list[str]) -> None:
-    """
-    In-place: turn columns into pandas 'category'.
-    """
-    for col in cat_cols:
-        if col not in df.columns:
-            continue
-        df[col] = df[col].astype("category")
-
-
 def apply_action_taken_flag(df: pd.DataFrame, cfg_clean: dict) -> pd.DataFrame:
-    """
-    Create binary target variable 'approved_flag' from action_taken codes.
-    Reads approved/denied/exclude codes from clean.yaml.
-    Returns filtered DataFrame with approved_flag (Int8: 1=approved, 0=denied).
-    """
     action_cfg = cfg_clean["clean"]["action_taken"]
     approved = set(action_cfg["approved"])
     denied = set(action_cfg["denied"])
@@ -153,7 +131,7 @@ def apply_action_taken_flag(df: pd.DataFrame, cfg_clean: dict) -> pd.DataFrame:
     df_out = df.loc[mask].copy()
 
     # We don't overwrite action_taken in case we want to further analyze the data later
-    df_out["denied_flag"] = df_out["action_taken"].isin(denied).astype("bool[pyarrow]")
+    df_out["denied_flag"] = df_out["action_taken"].isin(denied).astype("int8[pyarrow]")
 
     return df_out
 
