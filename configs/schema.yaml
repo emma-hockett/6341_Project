@@ -313,6 +313,7 @@ columns:
     role: feature
     type: categorical
     dtype: Int16
+    exempt: true
   total_units:
     role: feature
     type: categorical
