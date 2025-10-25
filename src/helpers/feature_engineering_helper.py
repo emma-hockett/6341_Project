@@ -1,8 +1,6 @@
 # src/helpers/eda_helpers.py
 import pandas as pd
-from typing import Dict, List
-from sklearn.preprocessing import OneHotEncoder
-import numpy as np
+from typing import Dict, List, Optional
 from sklearn.model_selection import train_test_split
 import src.utils.file_utils as fu
 
@@ -105,15 +103,39 @@ def create_train_test_splits(df: pd.DataFrame):
     print(f"Test indices saved to:  {test_output_path / 'test_index.csv'}")
 
 
-def one_hot_encode(df: pd.DataFrame) -> pd.DataFrame:
-    # Get the categorical features
-    cat_cols = df.select_dtypes(include=["string"]).columns
+def one_hot_encode_columns(df: pd.DataFrame, cfg_feature_engineering: dict) -> pd.DataFrame:
+    fe_cfg = cfg_feature_engineering["feature_engineering"]
+    df_out = df.copy()
 
-    # Create and fit a one hot encoder
-    ohe = OneHotEncoder(handle_unknown="ignore", sparse_output=False, dtype=np.uint8)
-    ohe_array = ohe.fit_transform(df[cat_cols])
+    for col_key, code_map in fe_cfg.items():
+        if not col_key.endswith("_ohe_map"):
+            continue
 
-    # Merge encoded columns into original data frame
-    ohe_cols = ohe.get_feature_names_out(cat_cols)
-    df_ohe = pd.DataFrame(ohe_array, columns=ohe_cols, index=df.index)
-    return pd.concat([df.drop(columns=cat_cols), df_ohe], axis=1)
+        base_col = col_key.replace("_ohe_map", "")
+        if base_col not in df_out.columns:
+            continue
+
+        s = df_out[base_col]
+        s_int = s.astype("Int64") if pd.api.types.is_integer_dtype(s) else s
+
+        # missing mask
+        na_mask = s.isna() | (s == -1)
+        df_out[f"{base_col}_NA"] = na_mask.astype("int8[pyarrow]")
+
+        # track mapped codes
+        mapped_codes = set()
+
+        # create columns for all defined mappings
+        for label, codes in code_map.items():
+            mask = s_int.isin(codes) & ~na_mask
+            df_out[f"{base_col}_{label}"] = mask.astype("int8[pyarrow]")
+            mapped_codes.update(codes)
+
+        # catch any unmapped, non-missing codes
+        other_mask = ~s_int.isin(mapped_codes) & ~na_mask
+        df_out[f"{base_col}_other"] = other_mask.astype("int8[pyarrow]")
+
+        # drop the original column
+        df_out.drop(columns=[base_col], inplace=True)
+
+    return df_out
