@@ -1,6 +1,7 @@
 # src/helpers/model_helpers.py
 import src.utils.file_utils as fu
 import pandas as pd
+import joblib
 
 def load_model_dataset():
     modeling_dataset = fu.load_parquet("hmda_2024_model")
@@ -27,3 +28,8 @@ def load_model_dataset():
     y_test = test_df[target_col]
 
     return X_train, y_train, X_test, y_test
+
+
+def persist_model(model, path_key: str):
+    model_path = fu.get_path(path_key)
+    joblib.dump(model, model_path)
