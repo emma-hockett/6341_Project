@@ -38,7 +38,7 @@ def load_model_dataset():
 
 def persist_model(model_selector, path_key: str):
     model_path = fu.get_path(path_key)
-    joblib.dump(model_selector.best_estimator_, model_path)
+    joblib.dump(model_selector.best_estimator_, model_path, compress=("gzip", 3))
 
 
 def save_metrics_to_csv(results, key: str):
