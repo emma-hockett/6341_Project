@@ -10,7 +10,7 @@ from sklearn.metrics import (
 )
 from sklearn.calibration import calibration_curve
 
-def load_model_dataset():
+def load_model_dataset(fraction = 0.005):
     modeling_dataset = fu.load_parquet("hmda_2024_model")
     train_output_path = fu.get_path("train_index")
     test_output_path = fu.get_path("test_index")
@@ -22,8 +22,8 @@ def load_model_dataset():
     test_df = modeling_dataset.loc[test_idx]
 
     # This is temporary to test functionality on a very small sample.  Remove before running final training.
-    train_df = train_df.sample(frac=0.005, random_state=42)
-    test_df = test_df.sample(frac=0.005, random_state=42)
+    train_df = train_df.sample(frac=fraction, random_state=42)
+    test_df = test_df.sample(frac=fraction, random_state=42)
 
     # Separate X and y
     target_col = "denied_flag"
