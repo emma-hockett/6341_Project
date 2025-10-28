@@ -3,6 +3,7 @@ import pandas as pd
 from typing import Dict, List, Optional
 from sklearn.model_selection import train_test_split
 import src.utils.file_utils as fu
+import numpy as np
 
 def generate_multi_hot_features(df: pd.DataFrame, cfg: Dict, prefix: str) -> pd.DataFrame:
     # Derive the code map key from the prefix
@@ -139,3 +140,10 @@ def one_hot_encode_columns(df: pd.DataFrame, cfg_feature_engineering: dict) -> p
         df_out.drop(columns=[base_col], inplace=True)
 
     return df_out
+
+
+def log_transform_skewed_features(df: pd.DataFrame) -> pd.DataFrame:
+    transform_features = ["income", "property_value", "loan_amount", "combined_loan_to_value_ratio"]
+    df[transform_features] = np.log1p(df[transform_features])
+
+    return df
