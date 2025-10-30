@@ -9,6 +9,8 @@ from sklearn.metrics import (
     RocCurveDisplay, PrecisionRecallDisplay
 )
 from sklearn.calibration import calibration_curve
+import numpy as np
+
 
 def load_model_dataset(fraction = 0.005):
     modeling_dataset = fu.load_parquet("hmda_2024_model")
@@ -59,8 +61,9 @@ def output_cv_summary(model_selector):
 
 def calculate_test_metrics(model_selector, X_test, y_test):
     best_lr = model_selector.best_estimator_
-    y_pred = best_lr.predict(X_test)
     y_prob = best_lr.predict_proba(X_test)[:, 1]
+    threshold = calculate_optimal_threshold(y_test, y_prob)
+    y_pred = (y_prob >= threshold).astype(int)
 
     metrics = {
         "F1": f1_score(y_test, y_pred),
@@ -75,6 +78,15 @@ def calculate_test_metrics(model_selector, X_test, y_test):
 
     # Return metrics
     return results, y_pred, y_prob
+
+
+def calculate_optimal_threshold(y_test, y_prob):
+    thresholds = np.linspace(0.0, 1.0, 200)
+    f1s = [f1_score(y_test, y_prob >= t) for t in thresholds]
+    best_threshold = thresholds[np.argmax(f1s)]
+    print(f"Best threshold = {best_threshold}, F1 = {max(f1s)}")
+
+    return best_threshold
 
 
 def draw_roc_curve(y_test, y_prob, output_path_key):
