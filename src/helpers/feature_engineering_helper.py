@@ -79,7 +79,7 @@ def impute_property_value(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def create_train_test_splits(df: pd.DataFrame):
+def create_train_test_splits(df: pd.DataFrame, index_suffix=""):
     # Stratified 85/15 split
     train_idx, test_idx = train_test_split(
         df.index,
@@ -93,8 +93,8 @@ def create_train_test_splits(df: pd.DataFrame):
     test_df = pd.DataFrame(test_idx, columns=["index"])
 
     # Output directory
-    train_output_path = fu.get_path("train_index")
-    test_output_path = fu.get_path("test_index")
+    train_output_path = fu.get_path("train_index" + index_suffix)
+    test_output_path = fu.get_path("test_index" + index_suffix)
 
     # Save index lists
     train_df.to_csv(train_output_path, index=False)
