@@ -12,10 +12,10 @@ from sklearn.calibration import calibration_curve
 import numpy as np
 
 
-def load_model_dataset(fraction = 0.005):
-    modeling_dataset = fu.load_parquet("hmda_2024_model")
-    train_output_path = fu.get_path("train_index")
-    test_output_path = fu.get_path("test_index")
+def load_model_dataset(fraction = 0.005, index_suffix=""):
+    modeling_dataset = fu.load_parquet("hmda_2024_model" + index_suffix)
+    train_output_path = fu.get_path("train_index" + index_suffix)
+    test_output_path = fu.get_path("test_index" + index_suffix)
     train_idx = pd.read_csv(train_output_path)["index"]
     test_idx = pd.read_csv(test_output_path)["index"]
 
