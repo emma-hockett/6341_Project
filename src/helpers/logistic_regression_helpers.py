@@ -10,7 +10,11 @@ def scale_dataset(df: pd.DataFrame) -> pd.DataFrame:
     project_root = get_project_root()
 
     numeric_cols = ['loan_amount', 'income', 'combined_loan_to_value_ratio', 'loan_term', 'intro_rate_period',
-                    'prepayment_penalty_term', 'property_value']
+                    'prepayment_penalty_term',
+                    'property_value', 'loan_to_income_ratio', 'debt_to_income_ratio_60100_x_loan_to_income_ratio',
+                    'debt_to_income_ratio_5060_x_loan_to_income_ratio',
+                    'debt_to_income_ratio_4850_x_loan_to_income_ratio',
+                    'debt_to_income_ratio_4547_x_loan_to_income_ratio']
 
     scaler = joblib.load(os.path.join(project_root, 'models', 'scaler.pkl'))
     X_train_scaled = scaler.transform(df[numeric_cols])
