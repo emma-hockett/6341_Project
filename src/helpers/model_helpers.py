@@ -9,11 +9,13 @@ from sklearn.metrics import (
     RocCurveDisplay, PrecisionRecallDisplay
 )
 from sklearn.calibration import calibration_curve
+import numpy as np
 
-def load_model_dataset():
-    modeling_dataset = fu.load_parquet("hmda_2024_model")
-    train_output_path = fu.get_path("train_index")
-    test_output_path = fu.get_path("test_index")
+
+def load_model_dataset(fraction = 0.005, index_suffix=""):
+    modeling_dataset = fu.load_parquet("hmda_2024_model" + index_suffix)
+    train_output_path = fu.get_path("train_index" + index_suffix)
+    test_output_path = fu.get_path("test_index" + index_suffix)
     train_idx = pd.read_csv(train_output_path)["index"]
     test_idx = pd.read_csv(test_output_path)["index"]
 
@@ -22,8 +24,8 @@ def load_model_dataset():
     test_df = modeling_dataset.loc[test_idx]
 
     # This is temporary to test functionality on a very small sample.  Remove before running final training.
-    train_df = train_df.sample(frac=0.005, random_state=42)
-    test_df = test_df.sample(frac=0.005, random_state=42)
+    train_df = train_df.sample(frac=fraction, random_state=42)
+    test_df = test_df.sample(frac=fraction, random_state=42)
 
     # Separate X and y
     target_col = "denied_flag"
@@ -59,8 +61,9 @@ def output_cv_summary(model_selector):
 
 def calculate_test_metrics(model_selector, X_test, y_test):
     best_lr = model_selector.best_estimator_
-    y_pred = best_lr.predict(X_test)
     y_prob = best_lr.predict_proba(X_test)[:, 1]
+    threshold = calculate_optimal_threshold(y_test, y_prob)
+    y_pred = (y_prob >= threshold).astype(int)
 
     metrics = {
         "F1": f1_score(y_test, y_pred),
@@ -75,6 +78,15 @@ def calculate_test_metrics(model_selector, X_test, y_test):
 
     # Return metrics
     return results, y_pred, y_prob
+
+
+def calculate_optimal_threshold(y_test, y_prob):
+    thresholds = np.linspace(0.0, 1.0, 200)
+    f1s = [f1_score(y_test, y_prob >= t) for t in thresholds]
+    best_threshold = thresholds[np.argmax(f1s)]
+    print(f"Best threshold = {best_threshold}, F1 = {max(f1s)}")
+
+    return best_threshold
 
 
 def draw_roc_curve(y_test, y_prob, output_path_key):
