@@ -143,7 +143,7 @@ def one_hot_encode_columns(df: pd.DataFrame, cfg_feature_engineering: dict) -> p
 
 
 def log_transform_skewed_features(df: pd.DataFrame) -> pd.DataFrame:
-    transform_features = ["income", "property_value", "loan_amount", "combined_loan_to_value_ratio"]
+    transform_features = ["income", "property_value", "loan_amount", "intro_rate_period", "loan_term", "loan_to_income_ratio", "prepayment_penalty_term", "combined_loan_to_value_ratio", 'debt_to_income_ratio_60100_x_loan_to_income_ratio', 'debt_to_income_ratio_5060_x_loan_to_income_ratio', 'debt_to_income_ratio_4850_x_loan_to_income_ratio', 'debt_to_income_ratio_4547_x_loan_to_income_ratio']
     df[transform_features] = np.log1p(df[transform_features])
 
     return df
